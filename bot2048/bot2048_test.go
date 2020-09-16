@@ -7,6 +7,7 @@ import (
 
 var b Bot2048
 
+// Matrix type
 type M [][]int
 
 func (b *Bot2048) setBoard(v M) {
@@ -48,23 +49,35 @@ func TestMerge(test *testing.T) {
 	}
 }
 
-func testMoveLeft(test *testing.T, b *Bot2048, init M, expected M) {
+type moveFunc func(*Bot2048)
+
+func testMove(test *testing.T, move moveFunc, b *Bot2048, init M, expected M) {
 	b.setBoard(init)
-	b.toLeft()
+	move(b)
 	if !b.eqBoard(expected) {
 		test.Errorf("toLeft: expected %d, got: %d", expected, b.board)
 	}
 	b.resetBoard()
 }
 
-func TestToLeft(test *testing.T) {
-	testMoveLeft(test, &b, M{{0, 0, 0, 2}}, M{{2, 0, 0, 0}})
-	testMoveLeft(test, &b, M{{0, 0, 2, 0}}, M{{2, 0, 0, 0}})
-	testMoveLeft(test, &b, M{{0, 2, 0, 0}}, M{{2, 0, 0, 0}})
-	testMoveLeft(test, &b, M{{2, 0, 0, 0}}, M{{2, 0, 0, 0}})
-	testMoveLeft(test, &b, M{{4, 2, 0, 0}}, M{{4, 2, 0, 0}})
-	testMoveLeft(test, &b, M{{8, 0, 4, 2}}, M{{8, 4, 2, 0}})
-	testMoveLeft(test, &b, M{{2, 0, 4, 2}}, M{{2, 4, 2, 0}})
-	testMoveLeft(test, &b, M{{2, 0, 4, 2}}, M{{2, 4, 2, 0}})
-	testMoveLeft(test, &b, M{{4, 4, 4, 4}}, M{{8, 8, 0, 0}})
+func TestMoveLeft(test *testing.T) {
+	testMove(test, moveLeft, &b, M{{0, 0, 0, 2}}, M{{2, 0, 0, 0}})
+	testMove(test, moveLeft, &b, M{{0, 0, 2, 0}}, M{{2, 0, 0, 0}})
+	testMove(test, moveLeft, &b, M{{0, 2, 0, 0}}, M{{2, 0, 0, 0}})
+	testMove(test, moveLeft, &b, M{{2, 0, 0, 0}}, M{{2, 0, 0, 0}})
+	testMove(test, moveLeft, &b, M{{4, 2, 0, 0}}, M{{4, 2, 0, 0}})
+	testMove(test, moveLeft, &b, M{{8, 0, 4, 2}}, M{{8, 4, 2, 0}})
+	testMove(test, moveLeft, &b, M{{2, 0, 4, 2}}, M{{2, 4, 2, 0}})
+	testMove(test, moveLeft, &b, M{{4, 4, 4, 4}}, M{{8, 8, 0, 0}})
+}
+
+func TestMoveRight(test *testing.T) {
+	testMove(test, moveRight, &b, M{{2, 0, 0, 0}}, M{{0, 0, 0, 2}})
+	testMove(test, moveRight, &b, M{{0, 2, 0, 0}}, M{{0, 0, 0, 2}})
+	testMove(test, moveRight, &b, M{{0, 0, 2, 0}}, M{{0, 0, 0, 2}})
+	testMove(test, moveRight, &b, M{{0, 0, 0, 2}}, M{{0, 0, 0, 2}})
+	testMove(test, moveRight, &b, M{{0, 0, 2, 4}}, M{{0, 0, 2, 4}})
+	testMove(test, moveRight, &b, M{{2, 4, 0, 8}}, M{{0, 2, 4, 8}})
+	testMove(test, moveRight, &b, M{{2, 4, 0, 2}}, M{{0, 2, 4, 2}})
+	testMove(test, moveRight, &b, M{{4, 4, 4, 4}}, M{{0, 0, 8, 8}})
 }

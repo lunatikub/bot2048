@@ -46,7 +46,7 @@ func (b *Bot2048) move(dst cell, src cell) {
 	b.board[src.y][src.x] = 0
 }
 
-func (b *Bot2048) moveLeft(c cell) {
+func shiftLeft(b *Bot2048, c cell) {
 	x := c.x - 1
 	for {
 		if x == -1 || b.board[c.y][x] != 0 {
@@ -60,13 +60,39 @@ func (b *Bot2048) moveLeft(c cell) {
 	}
 }
 
-func (b *Bot2048) toLeft() {
+func moveLeft(b *Bot2048) {
 	b.resetMerged()
 	for y := range b.board {
 		for x := 1; x < sz; x++ {
 			if b.board[y][x] != 0 {
-				b.moveLeft(cell{y, x})
+				shiftLeft(b, cell{y, x})
 			}
 		}
 	}
 }
+
+func shiftRight(b *Bot2048, c cell) {
+	x := c.x + 1
+	for {
+		if x == sz || b.board[c.y][x] != 0 {
+			break
+		}
+		b.move(cell{c.y, x}, cell{c.y, x - 1})
+		x++
+	}
+	if x < sz && !b.merged[c.y][x] && b.eq(cell{c.y, x}, cell{c.y, x - 1}) {
+		b.merge(cell{c.y, x}, cell{c.y, x - 1})
+	}
+}
+
+func moveRight(b *Bot2048) {
+	b.resetMerged()
+	for y := range b.board {
+		for x := sz - 2; x >= 0; x-- {
+			if b.board[y][x] != 0 {
+				shiftRight(b, cell{y, x})
+			}
+		}
+	}
+}
+
