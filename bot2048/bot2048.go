@@ -96,3 +96,27 @@ func moveRight(b *Bot2048) {
 	}
 }
 
+func shiftTop(b *Bot2048, c cell) {
+	y := c.y - 1
+	for {
+		if y == -1 || b.board[y][c.x] != 0 {
+			break
+		}
+		b.move(cell{y, c.x}, cell{y + 1, c.x})
+		y--
+	}
+	if y >= 0 && !b.merged[y][c.x] && b.eq(cell{y, c.x}, cell{y + 1, c.x}) {
+		b.merge(cell{y, c.x}, cell{y + 1, c.x})
+	}
+}
+
+func moveTop(b *Bot2048) {
+	b.resetMerged()
+	for x := 0; x < sz; x++ {
+		for y := 1; y < sz; y++ {
+			if b.board[y][x] != 0 {
+				shiftTop(b, cell{y, x})
+			}
+		}
+	}
+}
