@@ -39,16 +39,6 @@ func dump() {
 	}
 }
 
-func TestMerge(test *testing.T) {
-	b.resetBoard()
-	setBoard(M{{2, 2, 0, 0}})
-	b.merge(cell{0, 0}, cell{0, 1})
-	if !eqBoard(M{{4, 0, 0, 0}}) {
-		test.Errorf("expected: %d, got: %d",
-			M{{4, 0, 0, 0}}, b.board)
-	}
-}
-
 type moveFunc func(*Bot2048)
 
 func testMove(test *testing.T, move moveFunc, init M, expected M) {
@@ -93,4 +83,16 @@ func TestMoveTop(test *testing.T) {
 	testMove(test, moveTop, M{{8}, {0}, {4}, {2}}, M{{8}, {4}, {2}, {0}})
 	testMove(test, moveTop, M{{2}, {0}, {4}, {2}}, M{{2}, {4}, {2}, {0}})
 	testMove(test, moveTop, M{{4}, {4}, {4}, {4}}, M{{8}, {8}, {0}, {0}})
+}
+
+func TestMoveBottom(test *testing.T) {
+	b.resetBoard()
+	testMove(test, moveBottom, M{{2}, {0}, {0}, {0}}, M{{0}, {0}, {0}, {2}})
+	testMove(test, moveBottom, M{{0}, {2}, {0}, {0}}, M{{0}, {0}, {0}, {2}})
+	testMove(test, moveBottom, M{{0}, {0}, {2}, {0}}, M{{0}, {0}, {0}, {2}})
+	testMove(test, moveBottom, M{{0}, {0}, {0}, {2}}, M{{0}, {0}, {0}, {2}})
+	testMove(test, moveBottom, M{{0}, {0}, {2}, {4}}, M{{0}, {0}, {2}, {4}})
+	testMove(test, moveBottom, M{{2}, {4}, {0}, {8}}, M{{0}, {2}, {4}, {8}})
+	testMove(test, moveBottom, M{{2}, {4}, {0}, {2}}, M{{0}, {2}, {4}, {2}})
+	testMove(test, moveBottom, M{{4}, {4}, {4}, {4}}, M{{0}, {0}, {8}, {8}})
 }
