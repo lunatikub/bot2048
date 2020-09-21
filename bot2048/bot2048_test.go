@@ -37,6 +37,8 @@ func dump() {
 		}
 		fmt.Println()
 	}
+	fmt.Println(b.score)
+	fmt.Println()
 }
 
 type moveFunc func(*Bot2048)
@@ -95,4 +97,22 @@ func TestMoveBottom(test *testing.T) {
 	testMove(test, moveBottom, M{{2}, {4}, {0}, {8}}, M{{0}, {2}, {4}, {8}})
 	testMove(test, moveBottom, M{{2}, {4}, {0}, {2}}, M{{0}, {2}, {4}, {2}})
 	testMove(test, moveBottom, M{{4}, {4}, {4}, {4}}, M{{0}, {0}, {8}, {8}})
+}
+
+func TestScore(test *testing.T) {
+	b.resetBoard()
+	setBoard(M{{2, 2}})
+	moveLeft(&b)
+	b.board[1][0] = 2
+	moveRight(&b)
+	b.board[1][0] = 2
+	moveRight(&b)
+	b.board[2][0] = 2
+	moveTop(&b)
+	b.board[0][1] = 2
+	moveRight(&b)
+	scoreExpected := 20
+	if b.score != scoreExpected {
+		test.Errorf("score expected: %d, got %d", scoreExpected, b.score)
+	}
 }

@@ -13,6 +13,7 @@ type cell struct {
 type Bot2048 struct {
 	board  [sz][sz]int
 	merged [sz][sz]bool
+	score  int
 }
 
 func (b *Bot2048) resetBoard() {
@@ -45,5 +46,6 @@ func (b *Bot2048) merge(cond bool, dst, src cell) {
 		b.board[dst.y][dst.x] = 2 * b.board[src.y][src.x]
 		b.board[src.y][src.x] = 0
 		b.merged[dst.y][dst.x] = true
+		b.score += b.board[dst.y][dst.x]
 	}
 }
