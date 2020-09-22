@@ -1,24 +1,25 @@
 package bot2048
 
-func shiftLeft(b *Bot2048, c cell) {
-	x := c.x - 1
+func shiftLeft(b *B, c C) {
+	x := c.X - 1
 	for {
-		if x == -1 || b.board[c.y][x] != 0 {
+		if x == -1 || b.Board[c.Y][x] != 0 {
 			break
 		}
-		b.move(cell{c.y, x}, cell{c.y, x + 1})
+		b.swap(C{c.Y, x}, C{c.Y, x + 1})
 		x--
 	}
-	b.merge(x >= 0, cell{c.y, x}, cell{c.y, x + 1})
+	b.merge(x >= 0, C{c.Y, x}, C{c.Y, x + 1})
 }
 
-func moveLeft(b *Bot2048) {
+func moveLeft(b *B) {
 	b.resetMerge()
-	for y := range b.board {
-		for x := 1; x < sz; x++ {
-			if b.board[y][x] != 0 {
-				shiftLeft(b, cell{y, x})
+	for y := range b.Board {
+		for x := 1; x < SZ; x++ {
+			if b.Board[y][x] != 0 {
+				shiftLeft(b, C{y, x})
 			}
 		}
 	}
+
 }

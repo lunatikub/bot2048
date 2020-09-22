@@ -1,23 +1,23 @@
 package bot2048
 
-func shiftTop(b *Bot2048, c cell) {
-	y := c.y - 1
+func shiftTop(b *B, c C) {
+	y := c.Y - 1
 	for {
-		if y == -1 || b.board[y][c.x] != 0 {
+		if y == -1 || b.Board[y][c.X] != 0 {
 			break
 		}
-		b.move(cell{y, c.x}, cell{y + 1, c.x})
+		b.swap(C{y, c.X}, C{y + 1, c.X})
 		y--
 	}
-	b.merge(y >= 0, cell{y, c.x}, cell{y + 1, c.x})
+	b.merge(y >= 0, C{y, c.X}, C{y + 1, c.X})
 }
 
-func moveTop(b *Bot2048) {
+func moveTop(b *B) {
 	b.resetMerge()
-	for x := 0; x < sz; x++ {
-		for y := 1; y < sz; y++ {
-			if b.board[y][x] != 0 {
-				shiftTop(b, cell{y, x})
+	for x := 0; x < SZ; x++ {
+		for y := 1; y < SZ; y++ {
+			if b.Board[y][x] != 0 {
+				shiftTop(b, C{y, x})
 			}
 		}
 	}

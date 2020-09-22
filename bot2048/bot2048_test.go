@@ -1,11 +1,10 @@
 package bot2048
 
 import (
-	"fmt"
 	"testing"
 )
 
-var b Bot2048
+var b B
 
 // Matrix type
 type M [][]int
@@ -13,7 +12,7 @@ type M [][]int
 func setBoard(v M) {
 	for y, row := range v {
 		for x := range row {
-			b.board[y][x] = v[y][x]
+			b.Board[y][x] = v[y][x]
 		}
 	}
 }
@@ -21,7 +20,7 @@ func setBoard(v M) {
 func eqBoard(v M) bool {
 	for y, row := range v {
 		for x := range row {
-			if b.board[y][x] != v[y][x] {
+			if b.Board[y][x] != v[y][x] {
 				return false
 			}
 		}
@@ -29,30 +28,18 @@ func eqBoard(v M) bool {
 	return true
 }
 
-func dump() {
-	fmt.Println()
-	for _, row := range b.board {
-		for _, v := range row {
-			fmt.Print(v)
-		}
-		fmt.Println()
-	}
-	fmt.Println(b.score)
-	fmt.Println()
-}
-
-type moveFunc func(*Bot2048)
+type moveFunc func(*B)
 
 func testMove(test *testing.T, move moveFunc, init M, expected M) {
 	setBoard(init)
 	move(&b)
 	if !eqBoard(expected) {
-		test.Errorf("init: %d, expected %d, got: %d", init, expected, b.board)
+		test.Errorf("init: %d, expected %d, got: %d", init, expected, b.Board)
 	}
 }
 
 func TestMoveLeft(test *testing.T) {
-	b.resetBoard()
+	b.reset()
 	testMove(test, moveLeft, M{{0, 0, 0, 2}}, M{{2, 0, 0, 0}})
 	testMove(test, moveLeft, M{{0, 0, 2, 0}}, M{{2, 0, 0, 0}})
 	testMove(test, moveLeft, M{{0, 2, 0, 0}}, M{{2, 0, 0, 0}})
@@ -64,7 +51,7 @@ func TestMoveLeft(test *testing.T) {
 }
 
 func TestMoveRight(test *testing.T) {
-	b.resetBoard()
+	b.reset()
 	testMove(test, moveRight, M{{2, 0, 0, 0}}, M{{0, 0, 0, 2}})
 	testMove(test, moveRight, M{{0, 2, 0, 0}}, M{{0, 0, 0, 2}})
 	testMove(test, moveRight, M{{0, 0, 2, 0}}, M{{0, 0, 0, 2}})
@@ -76,7 +63,7 @@ func TestMoveRight(test *testing.T) {
 }
 
 func TestMoveTop(test *testing.T) {
-	b.resetBoard()
+	b.reset()
 	testMove(test, moveTop, M{{0}, {0}, {0}, {2}}, M{{2}, {0}, {0}, {0}})
 	testMove(test, moveTop, M{{0}, {0}, {2}, {0}}, M{{2}, {0}, {0}, {0}})
 	testMove(test, moveTop, M{{0}, {2}, {0}, {0}}, M{{2}, {0}, {0}, {0}})
@@ -88,7 +75,7 @@ func TestMoveTop(test *testing.T) {
 }
 
 func TestMoveBottom(test *testing.T) {
-	b.resetBoard()
+	b.reset()
 	testMove(test, moveBottom, M{{2}, {0}, {0}, {0}}, M{{0}, {0}, {0}, {2}})
 	testMove(test, moveBottom, M{{0}, {2}, {0}, {0}}, M{{0}, {0}, {0}, {2}})
 	testMove(test, moveBottom, M{{0}, {0}, {2}, {0}}, M{{0}, {0}, {0}, {2}})
@@ -100,19 +87,19 @@ func TestMoveBottom(test *testing.T) {
 }
 
 func TestScore(test *testing.T) {
-	b.resetBoard()
+	b.reset()
 	setBoard(M{{2, 2}})
 	moveLeft(&b)
-	b.board[1][0] = 2
+	b.Board[1][0] = 2
 	moveRight(&b)
-	b.board[1][0] = 2
+	b.Board[1][0] = 2
 	moveRight(&b)
-	b.board[2][0] = 2
+	b.Board[2][0] = 2
 	moveTop(&b)
-	b.board[0][1] = 2
+	b.Board[0][1] = 2
 	moveRight(&b)
 	scoreExpected := 20
-	if b.score != scoreExpected {
-		test.Errorf("score expected: %d, got %d", scoreExpected, b.score)
+	if b.Score != scoreExpected {
+		test.Errorf("score expected: %d, got %d", scoreExpected, b.Score)
 	}
 }
