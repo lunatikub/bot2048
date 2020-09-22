@@ -33,6 +33,21 @@ func getLine(b uint64, y uint8) uint16 {
 	return uint16(b >> shiftLine(y) & 0xffff)
 }
 
+func setCol(b uint64, x uint8, c uint16) uint64 {
+	b = setTile(b, 0, x, uint64(c>>12&0xf))
+	b = setTile(b, 1, x, uint64(c>>8&0xf))
+	b = setTile(b, 2, x, uint64(c>>4&0xf))
+	b = setTile(b, 3, x, uint64(c&0xf))
+	return b
+}
+
+func getCol(b uint64, x uint8) uint16 {
+	return uint16(getTile(b, 0, x))<<12 |
+		uint16(getTile(b, 1, x))<<8 |
+		uint16(getTile(b, 2, x))<<4 |
+		uint16(getTile(b, 3, x))
+}
+
 func moveLeft(b uint64) uint64 {
 	b = setLine(b, 0, transLeftTop[getLine(b, 0)])
 	b = setLine(b, 1, transLeftTop[getLine(b, 1)])
@@ -46,5 +61,21 @@ func moveRight(b uint64) uint64 {
 	b = setLine(b, 1, transRightBottom[getLine(b, 1)])
 	b = setLine(b, 2, transRightBottom[getLine(b, 2)])
 	b = setLine(b, 3, transRightBottom[getLine(b, 3)])
+	return b
+}
+
+func moveTop(b uint64) uint64 {
+	b = setCol(b, 0, transLeftTop[getCol(b, 0)])
+	b = setCol(b, 1, transLeftTop[getCol(b, 1)])
+	b = setCol(b, 2, transLeftTop[getCol(b, 2)])
+	b = setCol(b, 3, transLeftTop[getCol(b, 3)])
+	return b
+}
+
+func moveBottom(b uint64) uint64 {
+	b = setCol(b, 0, transRightBottom[getCol(b, 0)])
+	b = setCol(b, 1, transRightBottom[getCol(b, 1)])
+	b = setCol(b, 2, transRightBottom[getCol(b, 2)])
+	b = setCol(b, 3, transRightBottom[getCol(b, 3)])
 	return b
 }
