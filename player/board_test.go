@@ -72,3 +72,16 @@ func TestMoveLeft(t *testing.T) {
 	testMove(t, moveLeft, []uint16{2, 1, 1, 2}, []uint8{2, 2, 2, 0})
 	testMove(t, moveLeft, []uint16{4, 4, 4, 2}, []uint8{5, 4, 2, 0})
 }
+
+func TestMoveRight(t *testing.T) {
+	testMove(t, moveRight, []uint16{1, 1, 0, 0}, []uint8{0, 0, 0, 2})
+	testMove(t, moveRight, []uint16{0, 0, 1, 0}, []uint8{0, 0, 0, 1})
+	testMove(t, moveRight, []uint16{0, 2, 0, 0}, []uint8{0, 0, 0, 2})
+	testMove(t, moveRight, []uint16{2, 0, 0, 0}, []uint8{0, 0, 0, 2})
+	testMove(t, moveRight, []uint16{4, 2, 0, 0}, []uint8{0, 0, 4, 2})
+	testMove(t, moveRight, []uint16{8, 0, 4, 2}, []uint8{0, 8, 4, 2})
+	testMove(t, moveRight, []uint16{2, 0, 4, 2}, []uint8{0, 2, 4, 2})
+	testMove(t, moveRight, []uint16{4, 4, 4, 4}, []uint8{0, 0, 5, 5})
+	testMove(t, moveRight, []uint16{2, 1, 1, 2}, []uint8{0, 2, 2, 2})
+	testMove(t, moveRight, []uint16{4, 4, 4, 2}, []uint8{0, 4, 5, 2})
+}

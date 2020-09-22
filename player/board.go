@@ -40,3 +40,11 @@ func moveLeft(b uint64) uint64 {
 	b = setLine(b, 3, transLeftTop[getLine(b, 3)])
 	return b
 }
+
+func moveRight(b uint64) uint64 {
+	b = setLine(b, 0, transRightBottom[getLine(b, 0)])
+	b = setLine(b, 1, transRightBottom[getLine(b, 1)])
+	b = setLine(b, 2, transRightBottom[getLine(b, 2)])
+	b = setLine(b, 3, transRightBottom[getLine(b, 3)])
+	return b
+}
