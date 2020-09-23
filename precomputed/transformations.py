@@ -14,7 +14,7 @@ def trans(n, m):
     # nothing to do
     return n, m, True
 
-def transRightBottom(a, b, c, d):
+def transRightDown(a, b, c, d):
     c, d, m1 = trans(c, d)
     b, c, m2 = trans(b, c)
     if not m1:
@@ -26,7 +26,7 @@ def transRightBottom(a, b, c, d):
         c, d, _ = trans(c, d)
     return a, b, c, d
 
-def transLeftTop(a, b, c, d):
+def transLeftUp(a, b, c, d):
     b, a, m1 = trans(b, a)
     c, b, m2 = trans(c, b)
     if not m1:
@@ -51,19 +51,18 @@ for a in range(nibbleMax):
     for b in range(nibbleMax):
         for c in range(nibbleMax):
             for d in range(nibbleMax):
-                addTrans(TRB, transRightBottom(a, b, c, d))
-                addTrans(TLT, transLeftTop(a, b, c, d))
+                addTrans(TRB, transRightDown(a, b, c, d))
+                addTrans(TLT, transLeftUp(a, b, c, d))
 
 print("package player")
 print("// auto-generated file, do not update it !\n")
 
-print("var transLeftTop = []uint16{")
+print("var transLeftUp = []uint16{")
 for t in TLT:
     print(t, ", ", end='', sep='')
 print("\n}")
 
-
-print("var transRightBottom = []uint16{")
+print("var transRightDown = []uint16{")
 for t in TRB:
     print(t, ", ", end='', sep='')
 print("\n}")
