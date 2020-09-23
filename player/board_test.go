@@ -126,7 +126,7 @@ func TestMoveDown(t *testing.T) {
 	testMove(t, moveDown, M{{2}, {4}, {4}, {4}}, M{{0}, {2}, {4}, {5}})
 }
 
-func testMono(t *testing.T, e int, init M) {
+func testMono(t *testing.T, e int16, init M) {
 	b := setBoard(init)
 	if r := monotonicity(b); e != r {
 		t.Errorf("monotonicity, expected %d, got: %d", e, r)
@@ -152,4 +152,39 @@ func TestMonotonicity(t *testing.T) {
 		{2, 1, 2, 1},
 		{1, 2, 1, 2},
 		{2, 1, 2, 1}})
+}
+
+func testSmooth(t *testing.T, e int16, init M) {
+	b := setBoard(init)
+	if r := smoothness(b); e != r {
+		t.Errorf("smoothness, expected %d, got: %d", e, r)
+	}
+}
+
+func TestSmoothness(t *testing.T) {
+	// best case
+	testSmooth(t, 0, M{
+		{2, 2, 2, 2},
+		{2, 2, 2, 2},
+		{2, 2, 2, 2},
+		{2, 2, 2, 2}})
+	// bad case
+	testSmooth(t, 30, M{
+		{1, 0, 2, 0},
+		{0, 3, 1, 2},
+		{1, 0, 1, 0},
+		{0, 0, 1, 0}})
+}
+
+func TestFreeTiles(t *testing.T) {
+	var e int16
+	b := setBoard(M{
+		{2, 0, 2, 0},
+		{0, 2, 2, 0},
+		{1, 2, 3, 4},
+		{0, 0, 0, 0}})
+	e = 8
+	if r := freeTiles(b); r != e {
+		t.Errorf("freeTiles, expected %d, got: %d", e, r)
+	}
 }
