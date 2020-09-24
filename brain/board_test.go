@@ -1,4 +1,4 @@
-package player
+package brain
 
 import (
 	"testing"
@@ -17,7 +17,7 @@ func build(v []uint16) uint16 {
 }
 
 func getExpected(t *testing.T, b uint64, y, x uint8, e uint16) bool {
-	if r := get(b, y, x); uint16(r) != e {
+	if r := Get(b, y, x); uint16(r) != e {
 		t.Errorf("get(%d,%d), expected %d, got: %d", y, x, e, r)
 		return false
 	}
@@ -35,8 +35,8 @@ func lineExpected(t *testing.T, b uint64, y uint8, e []uint16) bool {
 
 func TestSetGetTile(t *testing.T) {
 	var b uint64
-	b = set(b, 0, 0, 1)
-	b = set(b, 3, 2, 2)
+	b = Set(b, 0, 0, 1)
+	b = Set(b, 3, 2, 2)
 	getExpected(t, b, 0, 0, 1)
 	getExpected(t, b, 3, 2, 2)
 	getExpected(t, b, 2, 2, 0)

@@ -1,4 +1,4 @@
-package player
+package brain
 
 const (
 	nrLine     = 4
@@ -15,14 +15,15 @@ func shiftTile(y, x uint8) uint8 {
 	return boardBits - y*lineBits - (x+1)*nibbleBits
 }
 
-// set a tile
-func set(b uint64, y, x uint8, v uint8) uint64 {
+// Set a tile
+func Set(b uint64, y, x, v uint8) uint64 {
 	n := shiftTile(y, x)
 	b &= ^(nibbleMask << n) // clear the nibble
 	return b | uint64(v)<<n // set the nibble
 }
 
-func get(b uint64, y, x uint8) uint8 {
+// Get a tile
+func Get(b uint64, y, x uint8) uint8 {
 	return uint8(b >> shiftTile(y, x) & nibbleMask)
 }
 
@@ -42,18 +43,18 @@ func getLine(b uint64, y uint8) uint16 {
 }
 
 func setCol(b uint64, x uint8, c uint16) uint64 {
-	b = set(b, 0, x, uint8(c>>(lineBits-nibbleBits)&nibbleMask))
-	b = set(b, 1, x, uint8(c>>(lineBits-2*nibbleBits)&nibbleMask))
-	b = set(b, 2, x, uint8(c>>(lineBits-3*nibbleBits)&nibbleMask))
-	b = set(b, 3, x, uint8(c&nibbleMask))
+	b = Set(b, 0, x, uint8(c>>(lineBits-nibbleBits)&nibbleMask))
+	b = Set(b, 1, x, uint8(c>>(lineBits-2*nibbleBits)&nibbleMask))
+	b = Set(b, 2, x, uint8(c>>(lineBits-3*nibbleBits)&nibbleMask))
+	b = Set(b, 3, x, uint8(c&nibbleMask))
 	return b
 }
 
 func getCol(b uint64, x uint8) uint16 {
-	return uint16(get(b, 0, x))<<(lineBits-nibbleBits) |
-		uint16(get(b, 1, x))<<(lineBits-2*nibbleBits) |
-		uint16(get(b, 2, x))<<(lineBits-3*nibbleBits) |
-		uint16(get(b, 3, x))
+	return uint16(Get(b, 0, x))<<(lineBits-nibbleBits) |
+		uint16(Get(b, 1, x))<<(lineBits-2*nibbleBits) |
+		uint16(Get(b, 2, x))<<(lineBits-3*nibbleBits) |
+		uint16(Get(b, 3, x))
 }
 
 func moveLeft(b uint64) uint64 {

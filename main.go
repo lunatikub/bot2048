@@ -1,58 +1,103 @@
 package main
 
 import (
-	"fmt"
+	"flag"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"os"
 	"time"
 
-	bot2048 "github.com/lunatikub/bot2048/bot2048"
+	"github.com/lunatikub/bot2048/brain"
+	"github.com/lunatikub/bot2048/eye"
+	"github.com/lunatikub/bot2048/hand"
 )
 
-func setRmd(b *bot2048.B) {
-	var empty []bot2048.C
-	values := []int{2, 2, 2, 2, 2, 2, 2, 2, 2, 4}
-
-	for y, row := range b.Board {
-		for x, v := range row {
-			if v == 0 {
-				empty = append(empty, bot2048.C{Y: y, X: x})
-			}
-		}
-	}
-	c := empty[rand.Intn(len(empty))]
-	v := values[rand.Intn(len(values))]
-	log.Println("[set]", c, v)
-	b.Board[c.Y][c.X] = v
+type options struct {
+	botEnabled bool
+	screenID   int
+	depth      int
+	log        string
+	logEnabled bool
 }
 
-func setLog() {
-	file, err := os.OpenFile("bot2048.log",
-		os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
-	if err != nil {
-		log.Fatal(err)
+func getOptions() *options {
+	opts := new(options)
+	flag.BoolVar(&opts.botEnabled, "enableBot", false, "enable bot for play2048.co")
+	flag.IntVar(&opts.screenID, "screenID", 1, "screen identifier 2048 tab")
+	flag.IntVar(&opts.depth, "depth", 3, "depth of the algorithm")
+	flag.StringVar(&opts.log, "log", "", "log file")
+
+	flag.Parse()
+
+	if opts.log != "" {
+		file, err := os.OpenFile(opts.log, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0666)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.SetOutput(file)
+		opts.logEnabled = true
+	} else {
+		opts.logEnabled = false
+		log.SetOutput(ioutil.Discard)
 	}
-	log.SetOutput(file)
-	//log.SetOutput(ioutil.Discard)
+
+	return opts
+}
+
+func move2str(m int) string {
+	switch m {
+	case brain.Left:
+		return "left"
+	case brain.Right:
+		return "right"
+	case brain.Up:
+		return "up"
+	case brain.Down:
+		return "down"
+	}
+	panic("not an available move")
 }
 
 func main() {
-	setLog()
-	rand.Seed(time.Now().UnixNano())
+	var board uint64 // main board
+	var h *hand.Hand // bot hand
+	var e *eye.Eye   // bot eye
+	var move int     // next best move
 
-	w := []int{1, 1}
+	rand.Seed(time.Now().UTC().UnixNano())
 
-	var b bot2048.B
-	setRmd(&b)
-	setRmd(&b)
+	opts := getOptions()
+
+	if opts.botEnabled {
+		e = eye.Init(opts.screenID)
+		board = e.FindNewTile(board)
+		board = e.FindNewTile(board)
+		h = hand.Init()
+	} else {
+		empty := brain.GetEmptyTiles(board)
+		board = brain.SetRandomTile(board, empty)
+		empty = brain.GetEmptyTiles(board)
+		board = brain.SetRandomTile(board, empty)
+	}
 
 	for {
-		b.Dump("main")
-		if r := b.Play(w); !r {
-			break
+		brain.Dump(board)
+		move = brain.GetBestMove(board, opts.depth)
+		board = brain.Move(board, move)
+		if opts.logEnabled {
+			log.Printf("[brain] best move: %s", move2str(move))
 		}
-		setRmd(&b)
+		if opts.botEnabled {
+			h.PressKey(move)
+			board = e.FindNewTile(board)
+		} else {
+			empty := brain.GetEmptyTiles(board)
+			if len(empty) == 0 { // game over
+				break
+			}
+			board = brain.SetRandomTile(board, empty)
+		}
 	}
-	fmt.Println(b.Score, b.MaxVal)
+	brain.EndGameDump(board)
 }

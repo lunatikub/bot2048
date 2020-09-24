@@ -7,5 +7,6 @@ require (
 	github.com/gbin/goncurses v0.0.0-20141106211150-34d9399fcea5
 	github.com/gen2brain/shm v0.0.0-20200228170931-49f9650110c5 // indirect
 	github.com/kbinani/screenshot v0.0.0-20191211154542-3a185f1ce18f
+	github.com/micmonay/keybd_event v1.1.0
 	golang.org/x/text v0.3.3 // indirect
 )
