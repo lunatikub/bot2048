@@ -16,10 +16,10 @@ func shiftTile(y, x uint8) uint8 {
 }
 
 // set a tile
-func set(b uint64, y, x uint8, v uint64) uint64 {
+func set(b uint64, y, x uint8, v uint8) uint64 {
 	n := shiftTile(y, x)
 	b &= ^(nibbleMask << n) // clear the nibble
-	return b | v<<n         // set the nibble
+	return b | uint64(v)<<n // set the nibble
 }
 
 func get(b uint64, y, x uint8) uint8 {
@@ -42,10 +42,10 @@ func getLine(b uint64, y uint8) uint16 {
 }
 
 func setCol(b uint64, x uint8, c uint16) uint64 {
-	b = set(b, 0, x, uint64(c>>(lineBits-nibbleBits)&nibbleMask))
-	b = set(b, 1, x, uint64(c>>(lineBits-2*nibbleBits)&nibbleMask))
-	b = set(b, 2, x, uint64(c>>(lineBits-3*nibbleBits)&nibbleMask))
-	b = set(b, 3, x, uint64(c&nibbleMask))
+	b = set(b, 0, x, uint8(c>>(lineBits-nibbleBits)&nibbleMask))
+	b = set(b, 1, x, uint8(c>>(lineBits-2*nibbleBits)&nibbleMask))
+	b = set(b, 2, x, uint8(c>>(lineBits-3*nibbleBits)&nibbleMask))
+	b = set(b, 3, x, uint8(c&nibbleMask))
 	return b
 }
 
