@@ -29,12 +29,10 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
+        sudo apt-get install libncursesw5-dev
 
     - name: Build
       run: make
 
     - name: Test
       run: make test
-
-    - coverage: Coverage
-      run: make test-coverage
