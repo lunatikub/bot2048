@@ -8,25 +8,22 @@ import (
 	"os"
 	"time"
 
-	"github.com/lunatikub/bot2048/brain"
-	"github.com/lunatikub/bot2048/eye"
-	"github.com/lunatikub/bot2048/hand"
+	gc "github.com/gbin/goncurses"
+	bot "github.com/lunatikub/bot2048/bot"
 )
 
 type options struct {
-	botEnabled bool
-	screenID   int
 	depth      int
 	log        string
 	logEnabled bool
+	pretty     bool
 }
 
 func getOptions() *options {
 	opts := new(options)
-	flag.BoolVar(&opts.botEnabled, "enableBot", false, "enable bot for play2048.co")
-	flag.IntVar(&opts.screenID, "screenID", 1, "screen identifier 2048 tab")
 	flag.IntVar(&opts.depth, "depth", 3, "depth of the algorithm")
 	flag.StringVar(&opts.log, "log", "", "log file")
+	flag.BoolVar(&opts.pretty, "pretty", false, "dump the doard with ncurses")
 
 	flag.Parse()
 
@@ -47,57 +44,50 @@ func getOptions() *options {
 
 func move2str(m int) string {
 	switch m {
-	case brain.Left:
+	case bot.Left:
 		return "left"
-	case brain.Right:
+	case bot.Right:
 		return "right"
-	case brain.Up:
+	case bot.Up:
 		return "up"
-	case brain.Down:
+	case bot.Down:
 		return "down"
 	}
 	panic("not an available move")
 }
 
 func main() {
-	var board uint64 // main board
-	var h *hand.Hand // bot hand
-	var e *eye.Eye   // bot eye
-	var move int     // next best move
+	var board uint64   // main board
+	var move int       // next best move
+	var win *gc.Window // window for ncurses
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	opts := getOptions()
 
-	if opts.botEnabled {
-		e = eye.Init(opts.screenID)
-		board = e.FindNewTile(board)
-		board = e.FindNewTile(board)
-		h = hand.Init()
-	} else {
-		empty := brain.GetEmptyTiles(board)
-		board = brain.SetRandomTile(board, empty)
-		empty = brain.GetEmptyTiles(board)
-		board = brain.SetRandomTile(board, empty)
+	if opts.pretty {
+		win = bot.ViewerInit()
 	}
 
+	empty := bot.GetEmptyTiles(board)
+	board = bot.SetRandomTile(board, empty)
+	empty = bot.GetEmptyTiles(board)
+	board = bot.SetRandomTile(board, empty)
+
 	for {
-		brain.Dump(board)
-		move = brain.GetBestMove(board, opts.depth)
-		board = brain.Move(board, move)
+		move = bot.GetBestMove(board, opts.depth)
+		board = bot.Move(board, move)
 		if opts.logEnabled {
-			log.Printf("[brain] best move: %s", move2str(move))
+			log.Printf("[bot] move: %s", move2str(move))
 		}
-		if opts.botEnabled {
-			h.PressKey(move)
-			board = e.FindNewTile(board)
-		} else {
-			empty := brain.GetEmptyTiles(board)
-			if len(empty) == 0 { // game over
-				break
-			}
-			board = brain.SetRandomTile(board, empty)
+		if opts.pretty {
+			bot.ViewerRefresh(win, board)
 		}
+		empty := bot.GetEmptyTiles(board)
+		if len(empty) == 0 { // game over
+			break
+		}
+		board = bot.SetRandomTile(board, empty)
 	}
-	brain.EndGameDump(board)
+	bot.EndGameDump(board)
 }

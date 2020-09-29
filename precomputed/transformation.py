@@ -77,7 +77,7 @@ for a in range(nibbleMax):
                 addTrans(TLU, transLeftUp(a, b, c, d))
 
 # Generate the file transition.go with the 2 slices.
-print("package brain\n")
+print("package bot\n")
 print("// auto-generated file by `transformation.py`.")
 print("// Do not update it !\n")
 

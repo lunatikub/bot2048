@@ -31,7 +31,10 @@ jobs:
         fi
 
     - name: Build
-      run: go build -v -o bot_2048 .
+      run: make
 
     - name: Test
-      run: go test -v .
+      run: make test
+
+    - coverage: Coverage
+      run: make test-coverage

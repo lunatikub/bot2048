@@ -93,17 +93,17 @@ def getPath(tile, majorDir, minorDir):
 
 data=[
     [(0, 0), Direction.RIGHT, Direction.DOWN],
-    [(3, 0), Direction.RIGHT, Direction.UP],
-    [(0, 3), Direction.LEFT, Direction.DOWN],
-    [(3, 3), Direction.LEFT, Direction.UP],
     [(0, 0), Direction.DOWN, Direction.RIGHT],
+    [(0, 3), Direction.LEFT, Direction.DOWN],
     [(0, 3), Direction.DOWN, Direction.LEFT],
-    [(0, 3), Direction.UP, Direction.RIGHT],
+    [(3, 0), Direction.RIGHT, Direction.UP],
+    [(3, 0), Direction.UP, Direction.RIGHT],
+    [(3, 3), Direction.LEFT, Direction.UP],
     [(3, 3), Direction.UP, Direction.LEFT],
 ]
 
 # Generate the file path.go
-print("package brain\n")
+print("package bot\n")
 print("// auto-generated file by `path.py`.")
 print("// Do not update it !\n")
 
