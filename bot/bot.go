@@ -5,6 +5,9 @@ import (
 	"math/rand"
 )
 
+// BoardSZ number of lines and colums of a board
+const BoardSZ = 4
+
 // Tile a cell board
 type Tile struct {
 	y uint8
@@ -26,8 +29,11 @@ const (
 	nrMove
 )
 
+var nrBoardEvaluated int // stats
+
 var moves = []int{Left, Right, Up, Down}
 
+// Power of 2 (except 0 -> 0 instead of 1)
 var pow2 = []int{
 	0, 2, 4, 8, 16, 32, 64, 128, 256, 512,
 	1024, 2048, 4096, 8192, 16384, 32768,
@@ -87,47 +93,48 @@ func eval(board uint64) int {
 	return maxScore
 }
 
-// Agent player
-func expectIMaxPlayer(board uint64, depth int) int {
+func expectIMaxPlayer(board uint64, depth int) (int, int) {
 	score := -1
+	move := 0
 
 	for m := range moves {
 		newBoard := Move(board, m)
 		if newBoard == board {
 			continue
 		}
-		newScore := expectIMax(newBoard, depth-1, Board)
+		newScore, _ := expectIMax(newBoard, depth-1, Board)
 		if newScore > score {
 			score = newScore
+			move = m
 		}
 	}
-	return score
+	return score, move
 }
 
-// Agent board
-func expectIMaxBoard(board uint64, depth int) int {
+func expectIMaxBoard(board uint64, depth int) (int, int) {
 	score := -1
 	tiles := GetEmptyTiles(board)
 
 	for _, tile := range tiles {
 		newBoard := Set(board, tile.y, tile.x, 2)
-		newScore := expectIMax(newBoard, depth-1, Player)
+		newScore, _ := expectIMax(newBoard, depth-1, Player)
 		if newScore != -1 {
 			score += (newScore * 10) / 100 // 10% to pop 4
 		}
 		newBoard = Set(board, tile.y, tile.x, 1)
-		newScore = expectIMax(newBoard, depth-1, Player)
+		newScore, _ = expectIMax(newBoard, depth-1, Player)
 		if newScore != -1 {
 			score += (newScore * 90) / 100 // 90% to pop 2
 		}
 	}
 	score /= len(tiles)
-	return score
+	return score, 0
 }
 
-func expectIMax(board uint64, depth, agent int) int {
+func expectIMax(board uint64, depth, agent int) (int, int) {
 	if depth == 0 {
-		return eval(board)
+		nrBoardEvaluated++
+		return eval(board), 0
 	}
 	if agent == Player {
 		return expectIMaxPlayer(board, depth)
@@ -137,20 +144,7 @@ func expectIMax(board uint64, depth, agent int) int {
 
 // GetBestMove return the best next move
 func GetBestMove(board uint64, depth int) int {
-	move := 0
-	score := -1
-
-	for m := range moves {
-		newBoard := Move(board, m)
-		if newBoard == board {
-			continue
-		}
-		newScore := expectIMax(newBoard, depth-1, Board)
-		if newScore > score {
-			move = m
-			score = newScore
-		}
-	}
+	_, move := expectIMax(board, depth, Player)
 	return move
 }
 
@@ -163,20 +157,28 @@ func SetRandomTile(board uint64, empty []Tile) uint64 {
 	return Set(board, c.y, c.x, v)
 }
 
-// EndGameDump dump the board, score and the max tile value
-func EndGameDump(b uint64) {
-	n := 0
-	var y, x, m uint8
+// GetStats return the maximum value of the board, the score
+// and the number of board evaluated
+func GetStats(board uint64) (int, int, int) {
+	score := 0
+	var y, x, max uint8
 	for y = 0; y < nrLine; y++ {
 		for x = 0; x < nrCol; x++ {
-			v := Get(b, y, x)
-			if v > m {
-				m = v
+			v := Get(board, y, x)
+			if v > max {
+				max = v
 			}
-			n += pow2[v]
+			score += pow2[v]
 		}
 	}
+	return pow2[max], score, nrBoardEvaluated
+}
+
+// EndGameDump dump the board, score and the max tile value
+func EndGameDump(board uint64) {
+	max, score, _ := GetStats(board)
 	log.Println("[brain] Game over")
-	log.Println("[brain] score", n)
-	log.Println("[brain] best tile", pow2[m])
+	log.Println("[brain] score", score)
+	log.Println("[brain] best tile", max)
+	log.Println("[brain] number of board evaluated", nrBoardEvaluated)
 }

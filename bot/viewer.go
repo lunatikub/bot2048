@@ -2,6 +2,7 @@ package bot
 
 import (
 	"log"
+	"time"
 
 	gc "github.com/gbin/goncurses"
 )
@@ -24,25 +25,24 @@ func ViewerInit() *gc.Window {
 }
 
 const (
-	sz     = 4
 	xShift = 2
 	yShift = 2
 )
 
 // ViewerRefresh dump the board
 func ViewerRefresh(win *gc.Window, board uint64) {
-	for i := 0; i < sz+1; i++ {
+	for i := 0; i < BoardSZ+1; i++ {
 		win.MovePrint(i*2+yShift, xShift, "+----+----+----+----+")
 	}
-	for i := 0; i < sz; i++ {
+	for i := 0; i < BoardSZ; i++ {
 		win.MovePrint(i*2+1+yShift, xShift, "|    |    |    |    |")
 	}
-	for y := 0; y < sz; y++ {
-		for x := 0; x < sz; x++ {
+	for y := 0; y < BoardSZ; y++ {
+		for x := 0; x < BoardSZ; x++ {
 			win.MovePrint(y*2+1+yShift, x+x*4+1+xShift,
 				pow2[Get(board, uint8(y), uint8(x))])
 		}
 	}
-	//time.Sleep(10 * time.Millisecond)
+	time.Sleep(10 * time.Millisecond)
 	win.Refresh()
 }

@@ -16,11 +16,11 @@ all: $(PATHGEN) $(TRANSGEN)
 	$(info $M build $(BIN))
 	$Q $(GO) build -o $(BIN) main.go
 
-$(PATHGEN): $(CURDIR)/path.py
+$(PATHGEN): $(CURDIR)/tools/path.py
 	$(info $M generate $@)
 	$Q $^ > $@
 
-$(TRANSGEN): $(CURDIR)/transformation.py
+$(TRANSGEN): $(CURDIR)/tools/transformation.py
 	$(info $M generate $@)
 	$Q $^ > $@
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -17,6 +18,7 @@ type options struct {
 	log        string
 	logEnabled bool
 	pretty     bool
+	stats      bool
 }
 
 func getOptions() *options {
@@ -24,6 +26,7 @@ func getOptions() *options {
 	flag.IntVar(&opts.depth, "depth", 3, "depth of the algorithm")
 	flag.StringVar(&opts.log, "log", "", "log file")
 	flag.BoolVar(&opts.pretty, "pretty", false, "dump the doard with ncurses")
+	flag.BoolVar(&opts.stats, "stats", false, "dump statistics")
 
 	flag.Parse()
 
@@ -62,7 +65,6 @@ func main() {
 	var win *gc.Window // window for ncurses
 
 	rand.Seed(time.Now().UTC().UnixNano())
-
 	opts := getOptions()
 
 	if opts.pretty {
@@ -74,9 +76,13 @@ func main() {
 	empty = bot.GetEmptyTiles(board)
 	board = bot.SetRandomTile(board, empty)
 
+	start := time.Now().UTC().UnixNano()
+	nrMove := 0
+
 	for {
 		move = bot.GetBestMove(board, opts.depth)
 		board = bot.Move(board, move)
+		nrMove++
 		if opts.logEnabled {
 			log.Printf("[bot] move: %s", move2str(move))
 		}
@@ -89,5 +95,13 @@ func main() {
 		}
 		board = bot.SetRandomTile(board, empty)
 	}
-	bot.EndGameDump(board)
+	if opts.logEnabled {
+		bot.EndGameDump(board)
+	}
+
+	end := time.Now().UTC().UnixNano()
+	if opts.stats {
+		max, score, nrEval := bot.GetStats(board)
+		fmt.Println(end-start, max, score, nrEval, nrMove)
+	}
 }
